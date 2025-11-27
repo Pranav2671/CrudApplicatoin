@@ -17,6 +17,7 @@ namespace CrudApplicatoin.Repositories
 
         public async Task AddAsync(Employee employee)
         {
+            employee.FullName = employee.FirstName+" "+employee.LastName;
             await _context.Employees.AddAsync(employee);
             await _context.SaveChangesAsync();
         }
@@ -43,6 +44,7 @@ namespace CrudApplicatoin.Repositories
 
         public async Task UpdateAsync(Employee employee)
         {
+            employee.FullName=employee.FirstName+" "+employee.LastName;
             _context.Employees.Update(employee);
             await _context.SaveChangesAsync();
         }
