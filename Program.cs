@@ -1,4 +1,5 @@
 using CrudApplicatoin.Data;
+using CrudApplicatoin.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace CrudApplicatoin
@@ -18,6 +19,9 @@ namespace CrudApplicatoin
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 
             });
+
+            builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
 
             var app = builder.Build();
 
