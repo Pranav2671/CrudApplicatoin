@@ -1,76 +1,98 @@
 ﻿using CrudApplicatoin.Data;
 using CrudApplicatoin.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace CrudApplicatoin.Controllers
 {
     public class EmployeeController : Controller
     {
         private readonly ApplicationContext _context;
+
         public EmployeeController(ApplicationContext context)
         {
             _context = context;
         }
-        public IActionResult Index()
+
+        // GET: Employee/Index
+        public async Task<IActionResult> Index()
         {
-            var result = _context.Employees.ToList();
+            var result = await _context.Employees.ToListAsync();
             return View(result);
         }
 
+        // GET: Employee/Create
         public IActionResult Create()
         {
             return View();
         }
 
+        // POST: Employee/Create
         [HttpPost]
-        public IActionResult Create (Employee model)
+        public async Task<IActionResult> Create(Employee model)
         {
-            if (ModelState.IsValid) {
+            if (ModelState.IsValid)
+            {
                 var emp = new Employee()
                 {
                     Name = model.Name,
                     City = model.City,
                     State = model.State,
                     Salary = model.Salary
-
                 };
 
-                _context.Employees.Add(emp);
-                _context.SaveChanges();
+                await _context.Employees.AddAsync(emp);
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction("Index");
             }
-            else
-            {
-                TempData["error"] = "Empty feild cant submitted";
-                return View(model);
-            }
 
+            TempData["error"] = "Empty field can't be submitted";
+            return View(model);
         }
 
-        public IActionResult Delete(int id)
+        // GET: Employee/Delete/5
+        public async Task<IActionResult> Delete(int id)
         {
-            var emp = _context.Employees.FirstOrDefault(e => e.Id == id);
+            var emp = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);
+
+            if (emp == null)
+            {
+                return NotFound();
+            }
+
             _context.Employees.Remove(emp);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
             return RedirectToAction("Index");
         }
 
-        public IActionResult Edit(int id)
+        // GET: Employee/Edit/5
+        public async Task<IActionResult> Edit(int id)
         {
-            var emp = _context.Employees.FirstOrDefault(e => e.Id == id);
+            var emp = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);
+
+            if (emp == null)
+            {
+                return NotFound();
+            }
 
             var result = new Employee()
             {
+                Id = emp.Id,
                 Name = emp.Name,
                 City = emp.City,
                 State = emp.State,
                 Salary = emp.Salary
             };
+
             return View(result);
         }
 
+        // POST: Employee/Edit
         [HttpPost]
-        public IActionResult Edit(Employee model)
+        public async Task<IActionResult> Edit(Employee model)
         {
             var emp = new Employee()
             {
@@ -82,9 +104,9 @@ namespace CrudApplicatoin.Controllers
             };
 
             _context.Employees.Update(emp);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
             return RedirectToAction("Index");
         }
-
     }
 }
